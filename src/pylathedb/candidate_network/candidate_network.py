@@ -5,6 +5,12 @@ from queue import deque
 from pylathedb.keyword_match import KeywordMatch
 from pylathedb.utils import Graph
 
+from google.cloud import bigquery
+
+gcp_project = "zeta-instrument-340221"
+bq_dataset = "imdb"
+table_path = f"{gcp_project}.{bq_dataset}"
+
 class CandidateNetwork(Graph):
 
     def __init__(self, graph_dict=None):
@@ -295,7 +301,7 @@ class CandidateNetwork(Graph):
         return CandidateNetwork.from_json_serializable(json.loads(json_cn))
 
     def get_sql_from_cn(self,schema_graph,**kwargs):
-        rows_limit=kwargs.get('rows_limit',1000)
+        rows_limit=kwargs.get('rows_limit',None)
         show_evaluation_fields=kwargs.get('show_evaluation_fields',False)
         tsvector_field_suffix=kwargs.get('tsvector_field_suffix','_tsvector')
 
@@ -313,17 +319,24 @@ class CandidateNetwork(Graph):
 
 
         def get_column_type(table,attribute):
-            # TODO: Handle attributes from the "varchar"  domain
-            # but do not have to be indexed
-            # if table == 'title' and attribute == 'production_year':
-            #     return 'integer'
-            # if table == 'organization' and attribute=='abbreviation':
-            #     return 'varchar'
-            return 'fulltext_indexed'
+            client = bigquery.Client(project=gcp_project)
+            client.dataset(bq_dataset)
+
+            sql = f'''
+                    SELECT data_type as type
+                    FROM `{table_path}.INFORMATION_SCHEMA.COLUMNS`
+                    WHERE table_schema="{bq_dataset}" AND table_name="{table}" AND column_name="{attribute}"
+                    '''
+
+            query = client.query(sql)
+            result = query.result().to_dataframe()
+            return result["type"][0]
 
         for prev_vertex,direction,vertex in self.dfs_pair_iter(root_predecessor=True):
             keyword_match, alias = vertex
+            #print(f"{keyword_match} - {alias}")
             for type_km, _ ,attribute,keywords in keyword_match.mappings():
+                #print (f"{type_km} - {attribute} - {keywords}")
                 selected_attributes.add(f'{alias}.{attribute}')
                 sql_keywords = [keyword.replace('\'','\'\'') for keyword in keywords]
 
@@ -331,19 +344,14 @@ class CandidateNetwork(Graph):
 
                     column_type=get_column_type(keyword_match.table,attribute)
 
-
-                    if column_type == 'fulltext_indexed':
-                        condition = f"{alias}.{attribute}{tsvector_field_suffix} @@ to_tsquery(\'{ ' & '.join(sql_keywords) }\')"
+                    for sql_keyword in sql_keywords:
+                        if column_type == 'STRING':
+                            condition = f"LOWER({alias}.{attribute}) LIKE \'%{sql_keyword}%\'"
+                        elif column_type == 'INT64':
+                            condition = f"{alias}.{attribute} = {sql_keyword}"
+                        else:
+                            condition = f"LOWER(CAST({alias}.{attribute} AS STRING) LIKE \'%{sql_keyword}%\'"
                         filter_conditions.append(condition)
-                    else:
-                        for sql_keyword in sql_keywords:
-                            if column_type == 'varchar':
-                                condition = f"{alias}.{attribute} ILIKE \'%{sql_keyword}%\'"
-                            elif column_type == 'integer':
-                                condition = f"{alias}.{attribute} = {sql_keyword}"
-                            else:
-                                condition = f"CAST({alias}.{attribute} AS VARCHAR) ILIKE \'%{sql_keyword}%\'"
-                            filter_conditions.append(condition)
 
             hashtables.setdefault(keyword_match.table,[]).append(alias)
 
@@ -351,7 +359,7 @@ class CandidateNetwork(Graph):
                 tables__search_id.append(f'{alias}.__search_id')
 
             if prev_vertex is None:
-                selected_tables.append(f'"{keyword_match.table}" {alias}')
+                selected_tables.append(f'`{table_path}.{keyword_match.table}` {alias}')
             else:
                 # After the second table, it starts to use the JOIN syntax
                 _ ,prev_alias = prev_vertex
@@ -364,12 +372,12 @@ class CandidateNetwork(Graph):
 
                 edge_info = schema_graph.get_edge_info(constraint_keyword_match.table,
                                             foreign_keyword_match.table)
-
                 for constraint in edge_info:
                     if constraint not in used_fks.setdefault(constraint_alias,[]):
                         used_fks[constraint_alias].append(constraint)
 
                         _,attribute_mappings = edge_info[constraint]
+
 
                         join_conditions = []
                         for (constraint_column,foreign_column) in attribute_mappings:
@@ -377,7 +385,7 @@ class CandidateNetwork(Graph):
                                 f'{constraint_alias}.{constraint_column} = {foreign_alias}.{foreign_column}'
                             )
                         txt_join_conditions = '\n\t\tAND '.join(join_conditions)
-                        selected_tables.append(f'JOIN "{keyword_match.table}" {alias} ON {txt_join_conditions}')
+                        selected_tables.append(f'JOIN `{table_path}.{keyword_match.table}` {alias} ON {txt_join_conditions}')
                         break
 
                 if show_evaluation_fields:
@@ -402,9 +410,15 @@ class CandidateNetwork(Graph):
         else:
             where_clause= ''
 
-        sql_text = '\nSELECT\n\t{}\nFROM\n\t{}\n{}\nLIMIT {};'.format(
-            ',\n\t'.join( tables__search_id+relationships__search_id+list(selected_attributes) ),
-            '\n\t'.join(selected_tables),
-            where_clause,
-            rows_limit)
+        if(rows_limit == None):
+            sql_text = '\nSELECT\n\t{}\nFROM\n\t{}\n{}\n;'.format(
+                ',\n\t'.join( tables__search_id+relationships__search_id+list(selected_attributes) ),
+                '\n\t'.join(selected_tables),
+                where_clause)
+        else:
+            sql_text = '\nSELECT\n\t{}\nFROM\n\t{}\n{}\nLIMIT {};'.format(
+                ',\n\t'.join( tables__search_id+relationships__search_id+list(selected_attributes) ),
+                '\n\t'.join(selected_tables),
+                where_clause,
+                rows_limit)
         return sql_text

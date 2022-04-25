@@ -13,7 +13,7 @@ from pylathedb.evaluation import EvaluationHandler
 logger = get_logger(__name__)
 class Lathe:
     def __init__(self, **kwargs):
-        config_directory = kwargs.get('config_directory','../config/')
+        config_directory = kwargs.get('config_directory','./config/')
         self.config = kwargs.get(
             'config',
             ConfigHandler(config_directory=config_directory)
@@ -77,7 +77,7 @@ class Lathe:
                 result = preprocessed_results[keyword_query]
             else:
                 result = self.keyword_search(keyword_query,**kwargs)
-            results.append(result)
+            results.append(result.data)
 
         data = {
             "database":self.config.connection['database'],
@@ -134,8 +134,9 @@ class Lathe:
         if keyword_query is None:
             print(f'Please input a keyword query or choose one of the queries below:')
             for i,item in enumerate(self.get_queryset()):
-                keyword_query = item['keyword_query']
-                print(f'{i+1:02d} - {keyword_query}')
+                if "keyword_query" in item :
+                    keyword_query = item['keyword_query']
+                    print(f'{i+1:02d} - {keyword_query}')
             return None
         if isinstance(keyword_query, int):
             keyword_query=self.get_queryset()[keyword_query-1]['keyword_query']
@@ -150,7 +151,6 @@ class Lathe:
                 
                 sk_matches = self.keyword_match_handler.schema_keyword_match_generator(keywords, self.index_handler.schema_index)
                 logger.info('%d SKMs generated: %s',len(sk_matches),sk_matches)
-                
                 start_vkm_time = timer()
                 vk_matches = self.keyword_match_handler.value_keyword_match_generator(keywords, self.index_handler.value_index)
                 # vk_matches = self.keyword_match_handler.filter_kwmatches_by_compound_keywords(vk_matches,compound_keywords)
@@ -167,7 +167,6 @@ class Lathe:
                 kw_matches = []
                 query_matches = self.evaluation_handler.golden_standards[keyword_query]['query_matches']
 
-            
             ranked_query_matches = self.query_match_handler.rank_query_matches(query_matches,
                 self.index_handler.value_index,
                 self.index_handler.schema_index,
@@ -197,8 +196,6 @@ class Lathe:
                 )
             else:
                 ranked_cns=[]
-
-
             logger.info('%d CNs generated: %s',len(ranked_cns),[(cn.score,cn) for cn in ranked_cns])
             end_cn_time = timer()
 

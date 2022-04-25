@@ -21,7 +21,7 @@ class LatheResult():
         show_df=kwargs.get('show_df',kwargs.get('df',kwargs.get('jnts',True)))
         top_k=kwargs.get('top_k',0)
         head=kwargs.get('head',5)
-
+        
         for i,json_cn in enumerate(self.data['candidate_networks']):
             cjn=CandidateNetwork.from_json_serializable(json_cn)
             printmd('---')
@@ -41,16 +41,16 @@ class LatheResult():
                 for (label_a,id_a),(label_b,id_b) in cjn.edges():
                     g.edge(id_a,id_b)
                 printmd('---')
-                print('Graph:')
+                print('\nGraph:')
                 display(g)
             if show_df or show_sql:
                 sql=cjn.get_sql_from_cn(self.index_handler.schema_graph)
                 if show_sql:
                     printmd('---')
-                    print(f'SQL:\n{shift_tab(sql,sep="  ")}\n')
+                    print(f'\nSQL:\n{shift_tab(sql,sep="  ")}\n')
                 if show_df:
                     printmd('---')
-                    print(f'JNTs:')
+                    print(f'\nJNTs:')
                     df = self.database_handler.get_dataframe(sql)
                     if head>0:
                         df = df.head(head)
