@@ -1,0 +1,74 @@
+[
+  {
+    "description": "",
+    "name": "id",
+    "type": "INT64",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "",
+    "name": "title",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "imdb_index",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "kind_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "year",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "imdb_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "phonetic_code",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "episode_of_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "season_nr",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "episode_nr",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "series_years",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "__search_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  }
+ ]

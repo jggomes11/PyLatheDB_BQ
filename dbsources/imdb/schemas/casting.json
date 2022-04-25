@@ -1,0 +1,50 @@
+[
+  {
+    "description": "",
+    "name": "id",
+    "type": "INT64",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "",
+    "name": "person_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "movie_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "person_role_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "note",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "nr_order",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "role_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "__search_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  }
+ ]

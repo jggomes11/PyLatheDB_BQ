@@ -1,0 +1,44 @@
+[
+  {
+    "description": "",
+    "name": "id",
+    "type": "INT64",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "",
+    "name": "name",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "imdb_index",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "imdb_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "name_pcode_nf",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "surname_pcode",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "__search_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  }
+ ]

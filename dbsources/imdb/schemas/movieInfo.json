@@ -1,0 +1,38 @@
+[
+  {
+    "description": "",
+    "name": "id",
+    "type": "INT64",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "",
+    "name": "movie_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "info_type_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "info",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "note",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "",
+    "name": "__search_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  }
+ ]
