@@ -86,10 +86,10 @@ class DatabaseIter:
                 #print(f'\nRow: {row}')
                 for col in result.columns:
                     #print(f"\nCol: {col}")
-                    ctid = result[col][row]
+                    id = result[col][row]
                     text = formatter(result[col][row])
                     #print(f"Text: {text}")
                     tokens = self.tokenizer.tokenize(text)
                     #print(f"Tokens: {tokens}")
                     for word in tokens:
-                        yield table,ctid,col, word
+                        yield table,id,col, word

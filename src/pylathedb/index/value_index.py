@@ -64,11 +64,11 @@ class ValueIndex():
     def get_mappings(self,keyword,table,attribute):
         return self[keyword][table][attribute]
 
-    def add_mapping(self,keyword,table,attribute,ctid):
+    def add_mapping(self,keyword,table,attribute,id):
         # This method does not change the persistant_filename
         self._dict.setdefault( keyword, (0, BabelHash() ) )
         self[keyword].setdefault(table , BabelHash() )
-        self[keyword][table].setdefault( attribute , [] ).append(ctid)
+        self[keyword][table].setdefault( attribute , [] ).append(id)
 
     def get_inverse_frequency(self,keyword):
         inverse_frequency, _value = self._get_underlying_item(keyword)
@@ -86,8 +86,8 @@ class ValueIndex():
         for word in self:
             inverse_frequency = self.get_inverse_frequency(word)
             for table in self[word]:
-                for attribute, ctids in self[word][table].items():
-                    frequency = len(ctids)
+                for attribute, ids in self[word][table].items():
+                    frequency = len(ids)
                     yield table,attribute,frequency,inverse_frequency
 
     def get_iaf(self,weight_scheme,keyword):

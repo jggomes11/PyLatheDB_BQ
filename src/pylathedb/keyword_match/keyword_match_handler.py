@@ -39,12 +39,12 @@ class KeywordMatchHandler:
                 if table in ignored_tables:
                     continue
 
-                for (attribute,ctids) in value_index[keyword][table].items():
+                for (attribute,ids) in value_index[keyword][table].items():
                     if (table,attribute) in ignored_attributes:
                         continue
 
                     vkm = KeywordMatch(table, value_filter={attribute:{keyword}})
-                    P[vkm] = set(ctids)
+                    P[vkm] = set(ids)
 
         #Part 2: Find sets of tuples containing larger termsets
         P = self.disjoint_itemsets(P)

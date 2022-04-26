@@ -88,11 +88,11 @@ class IndexHandler:
             logger.info('Indexing operation resumed.')
 
 
-        for table,ctid,attribute, word in self.database_handler.iterate_over_keywords(self.schema_index):
+        for table,id,attribute, word in self.database_handler.iterate_over_keywords(self.schema_index):
             if memory_size() >= max_memory_allowed:
                 logger.info(f'Memory usage exceeded the maximum memory allowed (above {max_memory_allowed/gb:.2f}GB).')
                 part_index()
-            self.value_index.add_mapping(word,table,attribute,ctid)
+            self.value_index.add_mapping(word,table,attribute,id)
 
         part_index()
 

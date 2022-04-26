@@ -394,7 +394,7 @@ class CandidateNetwork(Graph):
         for _,aliases in hashtables.items():
             for i in range(len(aliases)):
                 for j in range(i+1,len(aliases)):
-                    disambiguation_conditions.append(f'{aliases[i]}.ctid <> {aliases[j]}.ctid')
+                    disambiguation_conditions.append(f'{aliases[i]}.id <> {aliases[j]}.id')
 
         if len(tables__search_id)>0:
             tables__search_id = [f"({', '.join(tables__search_id)}) AS Tuples"]
